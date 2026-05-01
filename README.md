@@ -1,4 +1,3 @@
-# WallPager
 # WallPager GNOME Shell Extension
 
 This workspace contains the `WallPager` GNOME Shell extension, located in `wallpager@example.com`.
