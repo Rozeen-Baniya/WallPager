@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- Picture frame -->
+  <rect x="4" y="5" width="8" height="6" rx="0.8" ry="0.8" fill="none" stroke="#bebebe" stroke-width="1.2"/>
+  <!-- Mountain landscape -->
+  <path d="M4.5,10.2 L6.5,7.5 L8,9 L10,6.5 L11.5,10.2" fill="none" stroke="#bebebe" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- Sun -->
+  <circle cx="6" cy="7" r="0.9" fill="#bebebe"/>
+  <!-- Top-right cycling arrow -->
+  <path d="M10,2.5 C12,1.5 14,2.5 14,4.5" fill="none" stroke="#bebebe" stroke-width="1.1" stroke-linecap="round"/>
+  <path d="M13,2.5 L14.2,2.2 L14.3,3.5" fill="none" stroke="#bebebe" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- Bottom-left cycling arrow -->
+  <path d="M6,13.5 C4,14.5 2,13.5 2,11.5" fill="none" stroke="#bebebe" stroke-width="1.1" stroke-linecap="round"/>
+  <path d="M3,13.5 L1.8,13.8 L1.7,12.5" fill="none" stroke="#bebebe" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

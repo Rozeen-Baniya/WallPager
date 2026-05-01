@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.wallpager"
+          path="/org/gnome/shell/extensions/wallpager/">
+
+    <key name="wallpaper-dir" type="s">
+      <default>''</default>
+      <summary>Wallpaper Directory</summary>
+      <description>The directory to load wallpaper images from. If empty, defaults to ~/Pictures/Wallpapers.</description>
+    </key>
+
+    <key name="interval" type="i">
+      <default>900</default>
+      <summary>Change Interval</summary>
+      <description>Interval in seconds between automatic wallpaper changes. Default is 900 (15 minutes).</description>
+    </key>
+
+    <key name="icon-position" type="s">
+      <default>'right'</default>
+      <summary>Icon Position</summary>
+      <description>Position of the panel icon: 'left', 'center', or 'right'.</description>
+    </key>
+
+  </schema>
+</schemalist>

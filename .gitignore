@@ -1,0 +1,20 @@
+# Ignore generated and temporary files
+*.swp
+*~
+.DS_Store
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+*.log
+*.tmp
+*.cache
+
+# Ignore compiled GSettings schema files, which can be generated on install
+/wallpager@example.com/schemas/gschemas.compiled
+
+# Ignore generated archives and build artifacts
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz

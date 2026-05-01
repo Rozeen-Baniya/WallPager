@@ -1,0 +1,9 @@
+{
+    "uuid": "wallpager@example.com",
+    "name": "WallPager",
+    "description": "Automatically change desktop wallpaper from a user-specified directory at configurable intervals. Provides a panel icon with a dropdown menu to browse and select wallpapers manually.",
+    "shell-version": ["45", "46"],
+    "version": 1,
+    "url": "",
+    "settings-schema": "org.gnome.shell.extensions.wallpager"
+}
