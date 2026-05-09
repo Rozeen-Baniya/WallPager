@@ -21,5 +21,11 @@
       <description>Position of the panel icon: 'left', 'center', or 'right'.</description>
     </key>
 
+    <key name="panel-icon" type="s">
+      <default>''</default>
+      <summary>Panel Icon</summary>
+      <description>Path to a custom image to use as the panel icon. If empty, uses the default SVG icon.</description>
+    </key>
+
   </schema>
 </schemalist>

@@ -163,6 +163,78 @@ export default class WallPagerPreferences extends ExtensionPreferences {
 
         appearanceGroup.add(positionRow);
 
+        // Panel Icon picker row
+        const iconRow = new Adw.ActionRow({
+            title: _('Panel Icon'),
+            subtitle: _('Choose a wallpaper image to use as the panel icon'),
+        });
+
+        const currentPanelIcon = settings.get_string('panel-icon');
+        const iconPathLabel = new Gtk.Label({
+            label: currentPanelIcon ? GLib.path_get_basename(currentPanelIcon) : _('Default icon'),
+            ellipsize: 3, // PANGO_ELLIPSIZE_END
+            max_width_chars: 24,
+            valign: Gtk.Align.CENTER,
+            css_classes: ['dim-label'],
+        });
+
+        const iconBrowseButton = new Gtk.Button({
+            icon_name: 'document-open-symbolic',
+            valign: Gtk.Align.CENTER,
+            tooltip_text: _('Pick an image from your wallpaper folder'),
+            css_classes: ['flat'],
+        });
+
+        const iconResetButton = new Gtk.Button({
+            icon_name: 'edit-clear-symbolic',
+            valign: Gtk.Align.CENTER,
+            tooltip_text: _('Reset to default icon'),
+            css_classes: ['flat'],
+        });
+
+        iconBrowseButton.connect('clicked', () => {
+            const wallpaperDir = settings.get_string('wallpaper-dir') ||
+                GLib.build_filenamev([GLib.get_home_dir(), 'Pictures', 'Wallpapers']);
+            const dialog = new Gtk.FileDialog({
+                title: _('Choose Panel Icon Image'),
+                initial_folder: Gio.File.new_for_path(wallpaperDir),
+            });
+
+            // Only show image files
+            const filter = new Gtk.FileFilter();
+            filter.set_name(_('Images'));
+            filter.add_mime_type('image/*');
+            const filters = new Gio.ListStore({ item_type: Gtk.FileFilter });
+            filters.append(filter);
+            dialog.set_filters(filters);
+            dialog.set_default_filter(filter);
+
+            dialog.open(window, null, (dlg, result) => {
+                try {
+                    const file = dlg.open_finish(result);
+                    if (file) {
+                        const path = file.get_path();
+                        settings.set_string('panel-icon', path);
+                        iconPathLabel.set_label(GLib.path_get_basename(path));
+                    }
+                } catch (e) {
+                    if (!e.matches(Gtk.DialogError, Gtk.DialogError.DISMISSED))
+                        console.error(`[WallPager] Icon dialog error: ${e.message}`);
+                }
+            });
+        });
+
+        iconResetButton.connect('clicked', () => {
+            settings.set_string('panel-icon', '');
+            iconPathLabel.set_label(_('Default icon'));
+        });
+
+        iconRow.add_suffix(iconPathLabel);
+        iconRow.add_suffix(iconBrowseButton);
+        iconRow.add_suffix(iconResetButton);
+        appearanceGroup.add(iconRow);
+
+
         // ---- About Group ----
         const aboutGroup = new Adw.PreferencesGroup({
             title: _('About'),

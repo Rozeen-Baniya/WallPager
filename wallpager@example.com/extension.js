@@ -12,6 +12,7 @@ import St from 'gi://St';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
+import GdkPixbuf from 'gi://GdkPixbuf';
 
 
 export default class WallPagerExtension extends Extension {
@@ -77,25 +78,58 @@ export default class WallPagerExtension extends Extension {
 
         this._indicator = new PanelMenu.Button(0.0, 'WallPager', false);
 
-        const iconFile = this.dir.get_child('icons').get_child('wallpager-symbolic.svg');
-        const gicon = new Gio.FileIcon({ file: iconFile });
-        const icon = new St.Icon({
-            gicon: gicon,
-            style_class: 'system-status-icon',
-            icon_size: 18,
+        // Panel icon
+        this._panelIcon = new St.Icon({
+            gicon: this._getIndicatorGIcon(22),
+            icon_size: 22,
         });
-        this._indicator.add_child(icon);
+        this._indicator.add_child(this._panelIcon);
 
-        this._indicator.menu.box.set_style(
-            'background-color: rgba(18, 24, 30, 0.86);' +
-            'border: 1px solid rgba(255, 255, 255, 0.12);' +
-            'border-radius: 18px;' +
-            'padding: 18px 18px;' +
-            'min-width: 520px;'
-        );
+        /* Background only in stylesheet — avoids fighting theme + double transparency when menu redraws */
+        this._indicator.menu.box.set_style('padding: 18px 18px; width: 480px; border-radius: 18px;');
         this._indicator.menu.box.add_style_class_name('wallpager-menu-box');
 
         this._buildMenu();
+    }
+
+    _getIndicatorGIcon(size) {
+        const customIconPath = this._settings.get_string('panel-icon');
+        if (customIconPath && GLib.file_test(customIconPath, GLib.FileTest.EXISTS)) {
+            try {
+                return this._getSquarePixbuf(customIconPath, size);
+            } catch (e) {
+                console.log(`[WallPager] Error loading custom icon: ${e}`);
+            }
+        }
+        const iconFile = this.dir.get_child('icons').get_child('wallpager-symbolic.svg');
+        return new Gio.FileIcon({ file: iconFile });
+    }
+
+    _getSquarePixbuf(path, size) {
+        const pixbuf = GdkPixbuf.Pixbuf.new_from_file(path);
+        const w = pixbuf.get_width();
+        const h = pixbuf.get_height();
+        
+        // Zoom factor: 0.8 means we take the central 80% of the smallest dimension
+        // This 'zooms' into the center content (the logo)
+        const zoom = 0.8;
+        const cropSize = Math.floor(Math.min(w, h) * zoom);
+        
+        // Center crop
+        const x = Math.floor((w - cropSize) / 2);
+        const y = Math.floor((h - cropSize) / 2);
+        const square = pixbuf.new_subpixbuf(x, y, cropSize, cropSize);
+        
+        // Scale to target size
+        return square.scale_simple(size, size, GdkPixbuf.InterpType.BILINEAR);
+    }
+
+    _updatePanelIcon() {
+        if (this._panelIcon)
+            this._panelIcon.set_gicon(this._getIndicatorGIcon(22));
+        
+        if (this._headerIcon)
+            this._headerIcon.set_gicon(this._getIndicatorGIcon(24));
     }
 
     _repositionPanel() {
@@ -126,13 +160,12 @@ export default class WallPagerExtension extends Extension {
         });
 
         // Header icon
-        const hIconFile = this.dir.get_child('icons').get_child('wallpager-symbolic.svg');
-        const hGicon = new Gio.FileIcon({ file: hIconFile });
-        headerBox.add_child(new St.Icon({
-            gicon: hGicon,
-            icon_size: 20,
-            style: 'color: #66bb6a; margin-right: 8px;',  /* tertiary+ inter-element: 1 unit */
-        }));
+        this._headerIcon = new St.Icon({
+            gicon: this._getIndicatorGIcon(24),
+            icon_size: 24,
+            style: 'margin-right: 12px;', 
+        });
+        headerBox.add_child(this._headerIcon);
 
         // Title
         headerBox.add_child(new St.Label({
@@ -142,62 +175,9 @@ export default class WallPagerExtension extends Extension {
             style_class: 'wallpager-header-title',
         }));
 
-        // Toggle track
-        const isActive = this._isCycling;
-        this._toggleKnob = new St.Widget({
-            style_class: 'wallpager-toggle-knob',
-        });
-        this._toggleKnob.set_style(`margin-top: 6px; margin-left: ${isActive ? 32 : 4}px;`);
-
-        this._toggleStateLabel = new St.Label({
-            text: isActive ? 'ON' : 'OFF',
-            style_class: 'wallpager-toggle-state',
-            y_align: Clutter.ActorAlign.CENTER,
-        });
-
-        const toggleInner = new St.BoxLayout({
-            vertical: false,
-            x_align: Clutter.ActorAlign.CENTER,
-            style: 'spacing: 8px; padding-left: 4px; padding-right: 6px;',
-        });
-        toggleInner.add_child(this._toggleKnob);
-        toggleInner.add_child(this._toggleStateLabel);
-
-        this._toggleTrack = new St.Button({
-            style_class: `wallpager-toggle ${isActive ? 'checked' : 'off'}`,
-            reactive: true,
-            can_focus: false,
-            child: toggleInner,
-            style: 'margin-left: 16px;',
-        });
-        this._toggleTrack.connect('clicked', () => {
-            this._isCycling = !this._isCycling;
-            if (this._isCycling) {
-                this._toggleTrack.remove_style_class_name('off');
-                this._toggleTrack.add_style_class_name('checked');
-                this._toggleKnob.set_style('margin-top: 6px; margin-left: 32px;');
-                this._toggleStateLabel.set_text('ON');
-                this._startTimer();
-            } else {
-                this._toggleTrack.remove_style_class_name('checked');
-                this._toggleTrack.add_style_class_name('off');
-                this._toggleKnob.set_style('margin-top: 6px; margin-left: 4px;');
-                this._toggleStateLabel.set_text('OFF');
-                this._stopTimer();
-            }
-            this._updateIntervalLabel();
-        });
-        headerBox.add_child(this._toggleTrack);
-
-        // Interval label
-        this._intervalLabel = new St.Label({
-            text: this._getIntervalText(),
-            y_align: Clutter.ActorAlign.CENTER,
-            style: 'font-size: 11px; color: #a5d6a7; margin-left: 4px;',  /* tertiary: 0.5 units from toggle */
-        });
-        headerBox.add_child(this._intervalLabel);
 
         headerItem.add_child(headerBox);
+
         menu.addMenuItem(headerItem);
 
         // ── Separator ──
@@ -221,12 +201,14 @@ export default class WallPagerExtension extends Extension {
         });
 
         this._scrollView = new St.ScrollView({
-            hscrollbar_policy: St.PolicyType.AUTOMATIC,
-            vscrollbar_policy: St.PolicyType.NEVER,
+            hscrollbar_policy: St.PolicyType.NEVER,
+            vscrollbar_policy: St.PolicyType.AUTOMATIC,
             overlay_scrollbars: true,
+            y_expand: true,
             x_expand: true,
         });
-        this._scrollView.set_style('max-height: 340px; margin-top: 18px; padding: 0 12px;');  /* wider preview area with more spacing */
+        this._scrollView.add_style_class_name('wallpager-scroll-view');
+        this._scrollView.set_style('width: 444px; max-height: 310px; margin-top: 18px; padding: 0 12px;');
 
         this._gridContainer = new St.BoxLayout({
             vertical: true,
@@ -259,7 +241,9 @@ export default class WallPagerExtension extends Extension {
         }));
         openItem.connect('activate', () => {
             try {
-                Gio.AppInfo.launch_default_for_uri('file://' + this._getWallpaperDir(), null);
+                const dirPath = this._getWallpaperDir();
+                const folderUri = Gio.File.new_for_path(dirPath).get_uri();
+                Gio.AppInfo.launch_default_for_uri(folderUri, null);
             } catch (e) {
                 console.error(`[WallPager] ${e.message}`);
             }
@@ -313,58 +297,74 @@ export default class WallPagerExtension extends Extension {
             return;
         }
 
-        // 2-row horizontal grid
-        const numCols = Math.ceil(this._images.length / 2);
-        const row1 = new St.BoxLayout({ vertical: false, style_class: 'wallpager-grid-row' });
-        const row2 = new St.BoxLayout({ vertical: false, style_class: 'wallpager-grid-row' });
+        // 2-column vertical grid
+        const numCols = 2;
+        let currentRow = null;
 
-        for (let col = 0; col < numCols; col++) {
-            const i1 = col;
-            const i2 = col + numCols;
-            if (i1 < this._images.length)
-                row1.add_child(this._createThumbCell(this._images[i1], i1));
-            if (i2 < this._images.length)
-                row2.add_child(this._createThumbCell(this._images[i2], i2));
+        this._cells = []; // Keep track of cells for quick updates
+
+        for (let i = 0; i < this._images.length; i++) {
+            if (i % numCols === 0) {
+                currentRow = new St.BoxLayout({
+                    vertical: false,
+                    style_class: 'wallpager-grid-row',
+                    x_expand: true,
+                });
+                this._gridContainer.add_child(currentRow);
+            }
+            const cell = this._createThumbCell(this._images[i], i);
+            this._cells.push(cell);
+            currentRow.add_child(cell);
         }
+    }
 
-        this._gridContainer.add_child(row1);
-        if (this._images.length > numCols)
-            this._gridContainer.add_child(row2);
+    _updateGridSelection() {
+        if (!this._cells) return;
+        this._cells.forEach((cell, idx) => {
+            if (idx === this._currentIndex)
+                cell.add_style_class_name('active');
+            else
+                cell.remove_style_class_name('active');
+        });
     }
 
     _createThumbCell(imagePath, index) {
         const cell = new St.Button({
             style_class: 'wallpager-thumb-cell' + (index === this._currentIndex ? ' active' : ''),
-            x_align: Clutter.ActorAlign.CENTER,
         });
 
-        const box = new St.BoxLayout({
-            vertical: true,
-            x_align: Clutter.ActorAlign.CENTER,
+        // The preview area fills the entire cell
+        const previewArea = new St.Widget({
+            style_class: 'wallpager-thumb-preview',
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true,
+            y_expand: true,
         });
 
-        // Thumbnail
-        const file = Gio.File.new_for_path(imagePath);
-        const fileIcon = new Gio.FileIcon({ file: file });
-        box.add_child(new St.Icon({
-            gicon: fileIcon,
-            icon_size: 110,
-            style_class: 'wallpager-thumb-icon',
-        }));
+        // Load optimized thumbnail (210x140) with "cover" crop, save to temp file
+        // GNOME Shell CSS only supports file:// URLs, not data: URIs
+        try {
+            const pixbuf = this._getCoverPixbuf(imagePath, 210, 140);
+            if (pixbuf) {
+                const tmpPath = this._saveTempThumb(imagePath, pixbuf);
+                if (tmpPath) {
+                    previewArea.set_style(`
+                        background-image: url("file://${tmpPath}");
+                        background-size: cover;
+                        background-position: center;
+                    `);
+                }
+            }
+        } catch (e) {
+            console.log(`[WallPager] Thumb error: ${e}`);
+        }
 
-        // Label
-        const name = GLib.path_get_basename(imagePath);
-        box.add_child(new St.Label({
-            text: name.length > 12 ? name.substring(0, 10) + '…' : name,
-            style_class: 'wallpager-thumb-label',
-            x_align: Clutter.ActorAlign.CENTER,
-        }));
+        cell.set_child(previewArea);
 
-        cell.set_child(box);
         cell.connect('clicked', () => {
             this._currentIndex = index;
             this._setWallpaper(imagePath);
-            this._populateGrid();
+            this._updateGridSelection();
         });
 
         return cell;
@@ -416,24 +416,106 @@ export default class WallPagerExtension extends Extension {
                 .localeCompare(GLib.path_get_basename(b).toLowerCase())
         );
 
-        // Find current wallpaper
+        // Find current wallpaper (decode URI → path; naive strip breaks %20 etc.)
         const uri = this._bgSettings.get_string('picture-uri');
         if (uri) {
-            const idx = this._images.indexOf(uri.replace('file://', ''));
+            let idx = -1;
+            try {
+                const pathFromUri = Gio.File.new_for_uri(uri).get_path();
+                if (pathFromUri)
+                    idx = this._images.indexOf(pathFromUri);
+            } catch (e) {
+                /* ignore invalid stored URI */
+            }
             if (idx >= 0) this._currentIndex = idx;
         }
 
         console.log(`[WallPager] ${this._images.length} wallpapers from ${dirPath}`);
         this._populateGrid();
+
+        if (this._images.length > 0)
+            this._updateThemeColor(this._images[this._currentIndex]);
     }
 
     _setWallpaper(filePath) {
         try {
-            const uri = 'file://' + filePath;
+            const uri = Gio.File.new_for_path(filePath).get_uri();
             this._bgSettings.set_string('picture-uri', uri);
             this._bgSettings.set_string('picture-uri-dark', uri);
+            this._updateThemeColor(filePath);
         } catch (e) {
             console.error(`[WallPager] Set error: ${e.message}`);
+        }
+    }
+
+    _updateThemeColor(imagePath) {
+        if (!this._indicator) return;
+        try {
+            // Scale to 1x1 to get average color
+            const pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(imagePath, 1, 1, false);
+            const pixels = pixbuf.get_pixels();
+            const r = pixels[0];
+            const g = pixels[1];
+            const b = pixels[2];
+
+            // Use a slightly darker version for the background to ensure readability
+            // blending with a dark base
+            const br = Math.floor(r * 0.4);
+            const bg = Math.floor(g * 0.4);
+            const bb = Math.floor(b * 0.4);
+
+            const bgColor = `rgba(${br}, ${bg}, ${bb}, 0.92)`;
+            const borderColor = `rgba(${r}, ${g}, ${b}, 0.35)`;
+
+            this._indicator.menu.box.set_style(`
+                padding: 18px 18px;
+                background-color: ${bgColor};
+                border: 1px solid ${borderColor};
+                border-radius: 18px;
+                width: 480px;
+            `);
+        } catch (e) {
+            // Fallback to default green if color extraction fails
+            this._indicator.menu.box.set_style('padding: 18px 18px; width: 480px; border-radius: 18px;');
+        }
+    }
+
+    _getCoverPixbuf(imagePath, targetWidth, targetHeight) {
+        try {
+            const info = GdkPixbuf.Pixbuf.get_file_info(imagePath);
+            if (!info || info.length < 3) return null;
+            // GJS returns [format, width, height]
+            const width = info[1];
+            const height = info[2];
+
+            // Calculate scale to cover target area
+            const scale = Math.max(targetWidth / width, targetHeight / height);
+            const sw = Math.ceil(width * scale);
+            const sh = Math.ceil(height * scale);
+
+            // Load scaled
+            const scaled = GdkPixbuf.Pixbuf.new_from_file_at_scale(imagePath, sw, sh, true);
+            
+            // Crop center
+            const x = Math.max(0, Math.floor((sw - targetWidth) / 2));
+            const y = Math.max(0, Math.floor((sh - targetHeight) / 2));
+            
+            return scaled.new_subpixbuf(x, y, targetWidth, targetHeight);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    _saveTempThumb(imagePath, pixbuf) {
+        try {
+            // Create a unique temp filename based on the image path hash
+            const hash = imagePath.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            const tmpPath = `/tmp/wallpager_thumb_${hash}.png`;
+            pixbuf.savev(tmpPath, 'png', [], []);
+            return tmpPath;
+        } catch (e) {
+            console.log(`[WallPager] saveTempThumb error: ${e}`);
+            return null;
         }
     }
 
@@ -441,7 +523,7 @@ export default class WallPagerExtension extends Extension {
         if (this._images.length === 0) return;
         this._currentIndex = (this._currentIndex + 1) % this._images.length;
         this._setWallpaper(this._images[this._currentIndex]);
-        this._populateGrid();
+        this._updateGridSelection();
     }
 
     // ── Timer ──
@@ -498,7 +580,8 @@ export default class WallPagerExtension extends Extension {
 
     _onSettingsChanged(key) {
         if (key === 'wallpaper-dir') this._loadWallpapers();
-        else if (key === 'interval') { this._startTimer(); this._updateIntervalLabel(); }
+        else if (key === 'interval') { this._startTimer(); }
         else if (key === 'icon-position') this._repositionPanel();
+        else if (key === 'panel-icon') this._updatePanelIcon();
     }
 }

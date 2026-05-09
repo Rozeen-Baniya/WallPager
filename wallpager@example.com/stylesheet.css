@@ -10,40 +10,74 @@
    1. Toggle Switch
    ══════════════════════════════════════════════════════ */
 
-/* 1.2 — Switch track: pill-shaped */
+/* Pill track — ported from React toggle (green variant) */
 .wallpager-toggle {
-    width: 72px;
-    height: 36px;
-    border-radius: 18px;
-    background-color: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 4px;
-    margin: 0 18px 0 16px;
-    transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 18px rgba(0, 0, 0, 0.12);
+    width: 52px;
+    height: 28px;
+    min-width: 52px;
+    min-height: 28px;
+    max-width: 52px;
+    max-height: 28px;
+    border-radius: 14px;
+    background-color: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0 3px;
+    margin: 0 12px;
+    transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+/* Lock box model on interaction so theme cannot resize the track */
+.wallpager-toggle:hover,
+.wallpager-toggle:active,
+.wallpager-toggle:focus {
+    min-width: 52px;
+    min-height: 28px;
+    max-width: 52px;
+    max-height: 28px;
+    padding: 0 3px;
+    border-width: 1px;
 }
 
 .wallpager-toggle:hover {
     background-color: rgba(255, 255, 255, 0.18);
 }
 
-.wallpager-toggle.checked {
-    background-color: rgba(76, 175, 80, 0.85);
-    border-color: rgba(72, 159, 58, 0.9);
+/* Unique class names — avoid global `.checked` / `.off` Shell theme rules on St.Button */
+.wallpager-toggle.wallpager-toggle-state-on {
+    /* Nearly opaque — avoids stacking transparency over the panel and “matrix” bleed-through */
+    background-color: rgb(56, 142, 60);
+    border-color: rgb(40, 110, 44);
+    box-shadow: 0 0 0 2px rgba(56, 142, 60, 0.35);
 }
 
-.wallpager-toggle.off {
+/* OFF: dark transparent pill */
+.wallpager-toggle.wallpager-toggle-state-off {
     background-color: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: none;
 }
 
-/* 1.2 — Switch handle: smaller than track height */
+/* Knob: 22px pure white circle with shadow-toggle ring — matches React design */
 .wallpager-toggle-knob {
     width: 22px;
     height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    max-width: 22px;
+    max-height: 22px;
     border-radius: 11px;
-    background-color: #fbfdf7;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
-    transition: margin-left 140ms ease;
+    background-color: #ffffff;
+    /* shadow-toggle equivalent */
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.28);
+}
+
+/* Static CSS positions — actual slide animation driven by Clutter actor.ease() in JS */
+.wallpager-toggle.wallpager-toggle-state-off .wallpager-toggle-knob {
+    margin-left: 0px;
+}
+
+.wallpager-toggle.wallpager-toggle-state-on .wallpager-toggle-knob {
+    margin-left: 21px;
 }
 
 .wallpager-toggle-state {
@@ -51,19 +85,28 @@
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
+    margin-right: 12px;
 }
 
+/* Single source for panel chrome — nearly opaque so desktop/window content does not show through */
 .wallpager-menu-box {
-    background-color: rgba(18, 24, 30, 0.88);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
-    border-radius: 20px;
+    background-color: rgba(12, 32, 20, 0.92);
+    border: 1px solid rgba(76, 175, 80, 0.25);
+    border-radius: 18px;
+    width: 480px;
 }
 
 .wallpager-header-title {
     font-size: 18px;
     font-weight: 700;
     color: #f8fbff;
+}
+
+/* Reserve width so "Paused" ↔ "Change Every … Min." does not shift the whole header */
+.wallpager-interval-label {
+    font-size: 11px;
+    color: #a5d6a7;
+    margin-left: 0;
 }
 
 .wallpager-section-title {
@@ -73,58 +116,79 @@
     padding: 6px 12px;
 }
 
+.wallpager-scroll-view {
+    width: 444px;
+    max-height: 310px;
+}
+
+/* Hide scrollbar track and thumb visually, keep scroll behavior */
+.wallpager-scroll-view StScrollBar {
+    width: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+}
+
+.wallpager-scroll-view StScrollBar StBin,
+.wallpager-scroll-view StScrollBar StButton {
+    width: 0;
+    height: 0;
+}
+
 /* ══════════════════════════════════════════════════════
    2. Wallpaper Preview Section
    ══════════════════════════════════════════════════════ */
 
-/* 2.1 — Grid rows: consistent 8px (1 unit) gutters */
+/* 2.1 — Grid rows: consistent 10px gutters */
 .wallpager-grid-row {
-    spacing: 14px;
+    spacing: 10px;
 }
 
-/* 2.2 — Preview container */
+/* 2.2 — Preview container: full-box fill */
 .wallpager-thumb-cell {
-    min-width: 160px;
-    max-width: 160px;
+    min-width: 210px;
+    max-width: 210px;
+    min-height: 140px;
+    height: 140px;
     border-radius: 14px;
-    padding: 8px;
+    padding: 0;
     background-color: rgba(255, 255, 255, 0.05);
     transition-duration: 180ms;
     border: 1px solid rgba(255, 255, 255, 0.08);
     margin: 0;
+    overflow: hidden;
 }
 
 .wallpager-thumb-cell:hover {
     background-color: rgba(76, 175, 80, 0.14);
     border-color: rgba(76, 175, 80, 0.45);
-    transform: translateY(-1px);
 }
 
-/* 2.2 — Active state: thicker illuminated border with extra 2px (0.25 unit) padding */
 .wallpager-thumb-cell.active {
-    padding: 6px;
     border: 2px solid #9cffb4;
     background-color: rgba(76, 175, 80, 0.2);
     box-shadow: 0 0 16px rgba(76, 175, 80, 0.28);
 }
 
-/* 2.2 — Thumbnail icon: centered, aspect-ratio constrained */
-.wallpager-thumb-icon {
-    border-radius: 12px;
-    width: 100%;
-    height: 96px;
-    margin-bottom: 8px;
+.wallpager-thumb-preview {
+    border-radius: 14px;
 }
 
-/* 2.3 — Filename label: rounded container, centered */
-.wallpager-thumb-label {
-    font-size: 11px;
-    color: #d4e7ee;
+.wallpager-thumb-icon {
+    width: 210px;
+    height: 140px;
+}
+
+/* 2.3 — Overlay label: anchored to bottom */
+.wallpager-thumb-overlay-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
     text-align: center;
-    padding: 4px 8px;
-    margin-top: 6px;
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.06);
+    background-color: rgba(0, 0, 0, 0.65);
+    padding: 6px 4px;
+    border-radius: 0 0 14px 14px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
 /* ══════════════════════════════════════════════════════
@@ -148,4 +212,30 @@
 
 .wallpager-action-item:hover {
     background-color: rgba(76, 175, 80, 0.12);
+}
+
+/* ══════════════════════════════════════════════════════
+   5. Scrollbar Styling
+   ══════════════════════════════════════════════════════ */
+
+StScrollView StScrollBar {
+    padding: 2px;
+}
+
+StScrollView StScrollBar StButton#vhandle,
+StScrollView StScrollBar StButton#hhandle {
+    background-color: rgba(76, 175, 80, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    margin: 2px;
+}
+
+StScrollView StScrollBar StButton#vhandle:hover,
+StScrollView StScrollBar StButton#hhandle:hover {
+    background-color: rgba(76, 175, 80, 0.5);
+}
+
+StScrollView StScrollBar StButton#vhandle:active,
+StScrollView StScrollBar StButton#hhandle:active {
+    background-color: rgba(76, 175, 80, 0.7);
 }
