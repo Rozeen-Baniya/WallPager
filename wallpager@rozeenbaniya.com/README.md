@@ -21,9 +21,11 @@ A GNOME Shell extension that automatically changes your desktop wallpaper from a
 ![Wallpaper Grid Menu](assets/menu_preview.png)
 *The minimalist grid menu for quick wallpaper switching.*
 
-![Custom Logo Settings](assets/settings_preview.png)
-*Customize every detail, including the panel icon and change intervals.*
+![Extension Settings](assets/settings_preview.png)
+*Full control over appearance, including custom logos and intervals.*
 
+![Custom Icon Picker](assets/settings_preview2.png)
+*Choose any image from your wallpaper folder to use as the panel icon.*
 ## Features
 
 - **Lucid Glass UI**: A modern, transparent design that blends perfectly with your desktop.
