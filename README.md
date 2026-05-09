@@ -1,6 +1,14 @@
 # WallPager GNOME Shell Extension
 
+![WallPager Preview](assets/menu_preview.png)
+
 This workspace contains the `WallPager` GNOME Shell extension, located in `wallpager@rozeenbaniya.com`.
+
+## Key Features
+- **Dynamic 2x2 Grid**: Quickly browse and switch wallpapers.
+- **Customizable Logo**: Set any image as your panel icon with automatic smart-cropping.
+- **Minimalist Aesthetic**: High-performance, "glass" themed UI with no visual clutter.
+- **Auto-Cycling**: Effortlessly cycle wallpapers at your preferred interval.
 
 ## Installation for GNOME Users
 

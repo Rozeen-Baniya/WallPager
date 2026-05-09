@@ -16,6 +16,22 @@ A GNOME Shell extension that automatically changes your desktop wallpaper from a
 - GNOME Shell 45, 46
 - Ubuntu 24.04+
 
+## Previews
+
+![Wallpaper Grid Menu](assets/menu_preview.png)
+*The minimalist grid menu for quick wallpaper switching.*
+
+![Custom Logo Settings](assets/settings_preview.png)
+*Customize every detail, including the panel icon and change intervals.*
+
+## Features
+
+- **Lucid Glass UI**: A modern, transparent design that blends perfectly with your desktop.
+- **Custom Panel Logo**: Change the default WallPager icon to **any image** of your choice. It even center-crops and zooms automatically for a perfect fit!
+- **High Performance Grid**: 2x2 grid with memory-efficient thumbnails.
+- **Auto-Cycling**: Configurable intervals for automatic wallpaper changes.
+- **No Clutter**: No text labels or scrollbars—just your wallpapers.
+
 ## Installation
 
 ### From Source
