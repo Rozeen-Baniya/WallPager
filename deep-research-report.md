@@ -35,14 +35,14 @@ A proposed file table with brief contents:
 
 | File                          | Description                                                              | Key Snippet(s)                                                            |
 |-------------------------------|---------------------------------------------------------------------------|---------------------------------------------------------------------------|
-| `metadata.json`               | Extension metadata (UUID, name, versions, schema)                         | `"uuid": "wallpager@example.com", ... "settings-schema": "org.gnome.shell.extensions.wallpager"`【28†L190-L199】 |
+| `metadata.json`               | Extension metadata (UUID, name, versions, schema)                         | `"uuid": "wallpager@rozeenbaniya.com", ... "settings-schema": "org.gnome.shell.extensions.wallpager"`【28†L190-L199】 |
 | `extension.js`                | Main extension logic: enable/disable, UI setup, timer                    | `this._button = new PanelMenu.Button(...); Main.panel.addToStatusArea(..., this._button, position, Main.panel._leftBox); ... this._timerId = GLib.timeout_add_seconds(..., changeWallpaper)` |
 | `prefs.js`                    | Preferences UI (GTK4) to configure folder, interval, placement           | `window._settings = this.getSettings(); window._settings.bind('interval', switchRow, 'active', Gio.SettingsBindFlags.DEFAULT);`【30†L327-L336】【30†L348-L359】 |
 | `schemas/wallpager.gschema.xml` | GSettings schema defining keys (`wallpaper-dir`, etc.)                    | `<key name="wallpaper-dir" type="s"><default>'~/Pictures/Wallpapers'</default></key>` |
 | `panel-icon.svg`              | Status icon for panel                                                    | (SVG icon file)                                                             |
 | `README.md`                   | Description, installation, usage                                          | (Markdown instructions)                                                     |
 
-Each file should be placed under `~/.local/share/gnome-shell/extensions/wallpager@example.com/`, with `extension.js` and `metadata.json` in the root, and `schemas/` containing the schema XML.
+Each file should be placed under `~/.local/share/gnome-shell/extensions/wallpager@rozeenbaniya.com/`, with `extension.js` and `metadata.json` in the root, and `schemas/` containing the schema XML.
 
 ## 2. Panel Icon and Menu UI  
 The extension uses `PanelMenu.Button` (a `SystemStatusButton`) to insert an icon into the GNOME top bar【3†L231-L240】.  Depending on user configuration (prefs), the icon can be added to the left, center, or right section of the panel using `Main.panel.addToStatusArea()` with the optional `box` parameter【14†L7-L10】. For example: 

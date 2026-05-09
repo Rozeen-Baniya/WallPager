@@ -23,13 +23,13 @@ A GNOME Shell extension that automatically changes your desktop wallpaper from a
 1. Clone or download this repository into your extensions directory:
 
 ```bash
-cp -r wallpager@example.com ~/.local/share/gnome-shell/extensions/
+cp -r wallpager@rozeenbaniya.com ~/.local/share/gnome-shell/extensions/
 ```
 
 2. Compile the GSettings schemas:
 
 ```bash
-cd ~/.local/share/gnome-shell/extensions/wallpager@example.com
+cd ~/.local/share/gnome-shell/extensions/wallpager@rozeenbaniya.com
 glib-compile-schemas schemas/
 ```
 
@@ -40,15 +40,15 @@ glib-compile-schemas schemas/
 4. Enable the extension:
 
 ```bash
-gnome-extensions enable wallpager@example.com
+gnome-extensions enable wallpager@rozeenbaniya.com
 ```
 
 ### Using gnome-extensions pack
 
 ```bash
-cd wallpager@example.com
+cd wallpager@rozeenbaniya.com
 gnome-extensions pack . --extra-source=README.md
-gnome-extensions install wallpager@example.com.shell-extension.zip
+gnome-extensions install wallpager@rozeenbaniya.com.shell-extension.zip
 ```
 
 ## Configuration

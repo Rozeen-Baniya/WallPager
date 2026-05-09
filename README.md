@@ -1,19 +1,19 @@
 # WallPager GNOME Shell Extension
 
-This workspace contains the `WallPager` GNOME Shell extension, located in `wallpager@example.com`.
+This workspace contains the `WallPager` GNOME Shell extension, located in `wallpager@rozeenbaniya.com`.
 
 ## Installation for GNOME Users
 
 1. Copy the extension into your local GNOME Shell extensions directory:
 
 ```bash
-cp -r wallpager@example.com ~/.local/share/gnome-shell/extensions/
+cp -r wallpager@rozeenbaniya.com ~/.local/share/gnome-shell/extensions/
 ```
 
 2. Compile GSettings schemas:
 
 ```bash
-cd ~/.local/share/gnome-shell/extensions/wallpager@example.com
+cd ~/.local/share/gnome-shell/extensions/wallpager@rozeenbaniya.com
 glib-compile-schemas schemas/
 ```
 
@@ -24,7 +24,7 @@ glib-compile-schemas schemas/
 4. Enable the extension:
 
 ```bash
-gnome-extensions enable wallpager@example.com
+gnome-extensions enable wallpager@rozeenbaniya.com
 ```
 
 ## Notes
@@ -34,13 +34,13 @@ gnome-extensions enable wallpager@example.com
 
 ## Directory Layout
 
-- `wallpager@example.com/` — extension source files
-- `wallpager@example.com/metadata.json` — extension metadata
-- `wallpager@example.com/schemas/` — GSettings schema definitions
-- `wallpager@example.com/stylesheet.css` — extension styling
-- `wallpager@example.com/extension.js` — extension implementation
-- `wallpager@example.com/prefs.js` — preferences window
+- `wallpager@rozeenbaniya.com/` — extension source files
+- `wallpager@rozeenbaniya.com/metadata.json` — extension metadata
+- `wallpager@rozeenbaniya.com/schemas/` — GSettings schema definitions
+- `wallpager@rozeenbaniya.com/stylesheet.css` — extension styling
+- `wallpager@rozeenbaniya.com/extension.js` — extension implementation
+- `wallpager@rozeenbaniya.com/prefs.js` — preferences window
 
 ## Existing Extension README
 
-See `wallpager@example.com/README.md` for detailed extension usage, settings, and troubleshooting.
+See `wallpager@rozeenbaniya.com/README.md` for detailed extension usage, settings, and troubleshooting.

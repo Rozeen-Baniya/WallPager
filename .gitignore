@@ -11,7 +11,7 @@ __pycache__/
 *.cache
 
 # Ignore compiled GSettings schema files, which can be generated on install
-/wallpager@example.com/schemas/gschemas.compiled
+/wallpager@rozeenbaniya.com/schemas/gschemas.compiled
 
 # Ignore generated archives and build artifacts
 *.zip
