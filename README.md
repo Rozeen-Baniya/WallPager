@@ -38,7 +38,7 @@ A GNOME Shell extension that automatically changes your desktop wallpaper from a
 
 ### From Source
 
-1. Clone or download this repository into your extensions directory:
+1. Move the `wallpager@rozeenbaniya.com` folder into your local GNOME Shell extensions directory:
 
 ```bash
 cp -r wallpager@rozeenbaniya.com ~/.local/share/gnome-shell/extensions/

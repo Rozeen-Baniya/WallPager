@@ -346,7 +346,7 @@ export default class WallPagerExtension extends Extension {
         try {
             const pixbuf = this._getCoverPixbuf(imagePath, 210, 140);
             if (pixbuf) {
-                const tmpPath = this._saveTempThumb(imagePath, pixbuf);
+                const tmpPath = this._saveTempThumb(imagePath, pixbuf, index);
                 if (tmpPath) {
                     previewArea.set_style(`
                         background-image: url("file://${tmpPath}");
@@ -506,11 +506,14 @@ export default class WallPagerExtension extends Extension {
         }
     }
 
-    _saveTempThumb(imagePath, pixbuf) {
+    _saveTempThumb(imagePath, pixbuf, index) {
         try {
-            // Create a unique temp filename based on the image path hash
-            const hash = imagePath.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-            const tmpPath = `/tmp/wallpager_thumb_${hash}.png`;
+            const baseName = GLib.path_get_basename(imagePath)
+                .replace(/[^A-Za-z0-9_.-]/g, '_');
+            const tmpPath = GLib.build_filenamev([
+                GLib.get_tmp_dir(),
+                `wallpager_thumb_${index}_${baseName}.png`
+            ]);
             pixbuf.savev(tmpPath, 'png', [], []);
             return tmpPath;
         } catch (e) {
